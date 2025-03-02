@@ -38,7 +38,9 @@ function replaceTemp(temp, el) {
   output = output.replaceAll('{%QUANTITY%}', el.quantity);
   output = output.replaceAll('{%PRICE%}', el.price);
   output = output.replaceAll('{%ID%}', el.id);
-  output = output.replaceAll('{%DESCRIPTION%}}', el.description);
+  output = output.replaceAll('{%DESCRIPTION%}', el.description);
+  output = output.replaceAll('{%FROM%}', el.from);
+  output = output.replaceAll('{%NUTRIENTS%}', el.nutrients);
   if (el.organic) output = output.replaceAll('{%NOT_ORGANIC%}', 'not-organic');
 
   return output;
@@ -51,11 +53,10 @@ function filledOverview() {
 }
 
 const server = http.createServer((req, res) => {
-  const pathName = req.url;
-  console.log(pathName);
+  const { query, pathname } = url.parse(req.url, true);
 
   // NOTE: Overview page
-  if (pathName === '/' || pathName === '/overview') {
+  if (pathname === '/' || pathname === '/overview') {
     res.writeHead(200, {
       'Content-type': 'text/html',
     });
@@ -63,12 +64,18 @@ const server = http.createServer((req, res) => {
   }
 
   // NOTE: Product page
-  else if (pathName === '/product') {
-    res.end('');
+  else if (pathname === '/product') {
+    const product = dataObj[query.id];
+
+    productHtml = replaceTemp(tempProduct, product);
+    res.writeHead(200, {
+      'Content-type': 'text/html',
+    });
+    res.end(productHtml);
   }
 
   // NOTE: api route
-  else if (pathName === '/api') {
+  else if (pathname === '/api') {
     res.writeHead(200, {
       'Content-type': 'application/json',
     });
