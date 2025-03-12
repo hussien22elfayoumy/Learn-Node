@@ -1,16 +1,31 @@
 import express from 'express';
+import joi from 'joi';
 
 const router = express.Router();
 
 const AuthorSchema = joi.object({
-  title: joi.string().trim().min(3).max(200).required(),
-  author: joi.string().trim().min(3).max(200).required(),
-  price: joi.number().min(0).required(),
-  description: joi.string().trim().min(3).max(500).required(),
-  cover: joi.string().trim().required(),
+  firstName: joi.string().trim().min(3).max(200).required(),
+  lastName: joi.string().trim().min(3).max(200).required(),
+  nationality: joi.string().trim().min(3).max(200).required(),
+  image: joi.string().trim(),
 });
 
-const authors = [];
+const authors = [
+  {
+    id: 1,
+    firstName: 'Hussien',
+    lastName: 'Mohammed',
+    nationality: 'Egypt',
+    image: 'default-img.png',
+  },
+  {
+    id: 2,
+    firstName: 'Hussien2',
+    lastName: 'Mohammed2',
+    nationality: 'Egypt',
+    image: 'default-img.png',
+  },
+];
 
 /**
  * @desc Get All authors
@@ -53,11 +68,10 @@ router.post('/', (req, res) => {
 
   const newAuthor = {
     id: authors.length + 1,
-    title: req.body.title,
-    author: req.body.author,
-    description: req.body.description,
-    cover: req.body.cover,
-    price: req.body.price,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    nationality: req.body.nationality,
+    image: req.body.image,
   };
 
   res.status(201).json(newAuthor);
