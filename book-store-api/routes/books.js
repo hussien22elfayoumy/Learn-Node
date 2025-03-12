@@ -30,10 +30,22 @@ const books = [
   },
 ];
 
+/**
+ * @desc Get All routes
+ * @route /api/books/
+ * @method GET
+ * @access public
+ */
 router.get('/', (req, res) => {
   res.json(books);
 });
 
+/**
+ * @desc Get Books by id
+ * @route /api/books/:id
+ * @method GET
+ * @access public
+ */
 router.get('/:id', (req, res) => {
   const book = books.find((b) => b.id === +req.params.id);
 
@@ -44,6 +56,12 @@ router.get('/:id', (req, res) => {
   }
 });
 
+/**
+ * @desc Add new book
+ * @route /api/books/
+ * @method POST
+ * @access public
+ */
 router.post('/', (req, res) => {
   const { error } = BookSchema.validate(req.body);
 
@@ -64,6 +82,12 @@ router.post('/', (req, res) => {
   books.push(newBook);
 });
 
+/**
+ * @desc Update book by id
+ * @route /api/books/:id
+ * @method PUT
+ * @access public
+ */
 router.put('/:id', (req, res) => {
   const book = books.find((b) => b.id === +req.params.id);
 
@@ -91,6 +115,12 @@ router.put('/:id', (req, res) => {
   res.status(200).json({ message: 'Book updated succussfully', data: books });
 });
 
+/**
+ * @desc Delete book by id
+ * @route /api/books/:id
+ * @method DELETE
+ * @access public
+ */
 router.delete('/:id', (req, res) => {
   const book = books.find((b) => b.id === +req.params.id);
 
