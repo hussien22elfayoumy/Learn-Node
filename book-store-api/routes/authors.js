@@ -1,9 +1,10 @@
 import express from 'express';
 import joi from 'joi';
+import Author from '../models/Author.js';
 
 const router = express.Router();
 
-const AuthorSchema = joi.object({
+const AuthorSchemaValid = joi.object({
   firstName: joi.string().trim().min(3).max(200).required(),
   lastName: joi.string().trim().min(3).max(200).required(),
   nationality: joi.string().trim().min(3).max(200).required(),
@@ -59,23 +60,28 @@ router.get('/:id', (req, res) => {
  * @method POST
  * @access public
  */
-router.post('/', (req, res) => {
-  const { error } = AuthorSchema.validate(req.body);
+router.post('/', async (req, res) => {
+  const { error } = AuthorSchemaValid.validate(req.body);
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
 
-  const newAuthor = {
-    id: authors.length + 1,
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    nationality: req.body.nationality,
-    image: req.body.image,
-  };
+  try {
+    const newAuthor = new Author({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      nationality: req.body.nationality,
+      image: req.body.image,
+    });
 
-  res.status(201).json(newAuthor);
-  authors.push(newAuthor);
+    const resApi = await newAuthor.save();
+
+    res.status(201).json(resApi);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
 });
 
 /**
@@ -91,7 +97,7 @@ router.put('/:id', (req, res) => {
     return res.status(404).json({ message: 'author not found' });
   }
 
-  const { error } = AuthorSchema.validate(req.body);
+  const { error } = AuthorSchemaValid.validate(req.body);
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
