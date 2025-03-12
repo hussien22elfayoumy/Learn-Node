@@ -100,22 +100,39 @@ router.post('/', async (req, res) => {
  * @method PUT
  * @access public
  */
-router.put('/:id', (req, res) => {
-  const author = authors.find((b) => b.id === +req.params.id);
-
-  if (!author) {
-    return res.status(404).json({ message: 'author not found' });
-  }
-
+router.put('/:id', async (req, res) => {
   const { error } = AuthorSchemaValid.validate(req.body);
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
 
-  res
-    .status(200)
-    .json({ message: 'author updated succussfully', data: authors });
+  const newAuthor = {
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    nationality: req.body.nationality,
+    image: req.body.image,
+  };
+
+  try {
+    const author = await Author.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: newAuthor,
+      },
+      { new: true }
+    );
+
+    if (!author) {
+      return res.status(404).json({ message: 'author not found' });
+    }
+
+    res
+      .status(200)
+      .json({ message: 'author updated succussfully', data: author });
+  } catch (err) {
+    res.json(500).json({ message: 'Something went wrong' });
+  }
 });
 
 /**
