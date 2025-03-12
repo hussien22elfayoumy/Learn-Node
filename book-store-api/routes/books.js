@@ -64,4 +64,44 @@ router.post('/', (req, res) => {
   books.push(newBook);
 });
 
+router.put('/:id', (req, res) => {
+  const book = books.find((b) => b.id === +req.params.id);
+
+  if (!book) {
+    return res.status(404).json({ message: 'Book not found' });
+  }
+
+  const { error } = BookSchema.validate(req.body);
+
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  const newBook = {
+    title: req.body.title,
+    author: req.body.author,
+    description: req.body.description,
+    cover: req.body.cover,
+    price: req.body.price,
+  };
+
+  const bookIndex = books.indexOf(book);
+  books.splice(bookIndex, 1, { ...newBook, id: book.id });
+
+  res.status(200).json({ message: 'Book updated succussfully', data: books });
+});
+
+router.delete('/:id', (req, res) => {
+  const book = books.find((b) => b.id === +req.params.id);
+
+  if (!book) {
+    return res.status(404).json({ message: 'Book not found' });
+  }
+
+  const bookIndex = books.indexOf(book);
+  books.splice(bookIndex, 1);
+
+  res.status(200).json({ message: 'Book Deleted succussfully', data: books });
+});
+
 export default router;
