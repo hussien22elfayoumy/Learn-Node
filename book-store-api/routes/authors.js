@@ -11,23 +11,6 @@ const AuthorSchemaValid = joi.object({
   image: joi.string().trim(),
 });
 
-const authors = [
-  {
-    id: 1,
-    firstName: 'Hussien',
-    lastName: 'Mohammed',
-    nationality: 'Egypt',
-    image: 'default-img.png',
-  },
-  {
-    id: 2,
-    firstName: 'Hussien2',
-    lastName: 'Mohammed2',
-    nationality: 'Egypt',
-    image: 'default-img.png',
-  },
-];
-
 /**
  * @desc Get All authors
  * @route /api/authors/
@@ -141,16 +124,20 @@ router.put('/:id', async (req, res) => {
  * @method DELETE
  * @access public
  */
-router.delete('/:id', (req, res) => {
-  const author = authors.find((b) => b.id === +req.params.id);
+router.delete('/:id', async (req, res) => {
+  try {
+    const author = await Author.findById(req.params.id);
+    if (!author) {
+      return res.status(404).json({ message: 'author not found' });
+    }
 
-  if (!author) {
-    return res.status(404).json({ message: 'author not found' });
+    await Author.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: 'Author Deleted succussfully' });
+  } catch (err) {
+    console.log(err);
+    return res.json(500).json({ message: 'Something went wrong' });
   }
-
-  res
-    .status(200)
-    .json({ message: 'author Deleted succussfully', data: authors });
 });
 
 export default router;
