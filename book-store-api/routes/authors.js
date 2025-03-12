@@ -34,8 +34,14 @@ const authors = [
  * @method GET
  * @access public
  */
-router.get('/', (req, res) => {
-  res.status(200).json(authors);
+router.get('/', async (req, res) => {
+  try {
+    const authorsList = await Author.find();
+    res.status(200).json({ message: 'success', authors: authorsList });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Something wend wrong' });
+  }
 });
 
 /**
@@ -44,13 +50,17 @@ router.get('/', (req, res) => {
  * @method GET
  * @access public
  */
-router.get('/:id', (req, res) => {
-  const author = authors.find((b) => b.id === +req.params.id);
-
-  if (author) {
-    res.status(200).json(author);
-  } else {
-    res.status(404).json({ message: 'author not found' });
+router.get('/:id', async (req, res) => {
+  try {
+    const author = await Author.findById(req.params.id);
+    if (author) {
+      res.status(200).json({ message: 'success', author: author });
+    } else {
+      res.status(404).json({ message: 'author not found' });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Something wend wrong' });
   }
 });
 
