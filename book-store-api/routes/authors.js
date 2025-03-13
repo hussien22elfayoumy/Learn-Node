@@ -1,6 +1,6 @@
 import express from 'express';
 import joi from 'joi';
-import Author from '../models/Author.js';
+import { Author } from '../models/Author.js';
 
 const router = express.Router();
 

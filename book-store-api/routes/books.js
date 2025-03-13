@@ -3,7 +3,7 @@ import joi from 'joi';
 
 const router = express.Router();
 
-const BookSchema = joi.object({
+const BookSchemaValid = joi.object({
   title: joi.string().trim().min(3).max(200).required(),
   author: joi.string().trim().min(3).max(200).required(),
   price: joi.number().min(0).required(),
@@ -63,7 +63,7 @@ router.get('/:id', (req, res) => {
  * @access public
  */
 router.post('/', (req, res) => {
-  const { error } = BookSchema.validate(req.body);
+  const { error } = BookSchemaValid.validate(req.body);
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
@@ -95,7 +95,7 @@ router.put('/:id', (req, res) => {
     return res.status(404).json({ message: 'Book not found' });
   }
 
-  const { error } = BookSchema.validate(req.body);
+  const { error } = BookSchemaValid.validate(req.body);
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
