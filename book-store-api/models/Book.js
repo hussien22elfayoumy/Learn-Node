@@ -16,12 +16,12 @@ const BooksSchema = new mongoose.Schema(
     description: {
       type: String,
       required: true,
+      minlength: 5,
       trim: true,
     },
     price: {
       type: Number,
       required: true,
-      trim: true,
       min: 0,
     },
     cover: {

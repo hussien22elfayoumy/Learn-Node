@@ -5,11 +5,11 @@ import { Book } from '../models/Book.js';
 const router = express.Router();
 
 const BookSchema = joi.object({
-  title: joi.string().trim().min(3).max(200).required(),
-  author: joi.string().trim().min(3).max(200).required(),
+  title: joi.string().trim().min(3).max(250).required(),
+  author: joi.string().required(),
   price: joi.number().min(0).required(),
   description: joi.string().trim().min(3).max(500).required(),
-  cover: joi.string().trim().required(),
+  cover: joi.string().trim().valid('soft cover', 'hard cover').required(),
 });
 
 /**
@@ -20,7 +20,11 @@ const BookSchema = joi.object({
  */
 router.get('/', async (req, res) => {
   try {
-    const bookList = await Book.find();
+    const bookList = await Book.find().populate('author', [
+      '_id',
+      'firstName',
+      'lastName',
+    ]);
     res.status(200).json({ message: 'success', books: bookList });
   } catch (err) {
     console.log(err);
@@ -36,7 +40,11 @@ router.get('/', async (req, res) => {
  */
 router.get('/:id', async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id);
+    const book = await Book.findById(req.params.id).populate('author', [
+      '_id',
+      'firstName',
+      'lastName',
+    ]);
     if (book) {
       res.status(200).json({ message: 'Success', book });
     } else {
