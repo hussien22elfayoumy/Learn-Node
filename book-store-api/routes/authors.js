@@ -4,7 +4,7 @@ import { Author } from '../models/Author.js';
 
 const router = express.Router();
 
-const AuthorSchemaValid = joi.object({
+const AuthorSchema = joi.object({
   firstName: joi.string().trim().min(3).max(200).required(),
   lastName: joi.string().trim().min(3).max(200).required(),
   nationality: joi.string().trim().min(3).max(200).required(),
@@ -54,7 +54,7 @@ router.get('/:id', async (req, res) => {
  * @access public
  */
 router.post('/', async (req, res) => {
-  const { error } = AuthorSchemaValid.validate(req.body);
+  const { error } = AuthorSchema.validate(req.body);
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
@@ -84,7 +84,7 @@ router.post('/', async (req, res) => {
  * @access public
  */
 router.put('/:id', async (req, res) => {
-  const { error } = AuthorSchemaValid.validate(req.body);
+  const { error } = AuthorSchema.validate(req.body);
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });

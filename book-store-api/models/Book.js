@@ -19,7 +19,7 @@ const BooksSchema = new mongoose.Schema(
       trim: true,
     },
     price: {
-      type: number,
+      type: Number,
       required: true,
       trim: true,
       min: 0,

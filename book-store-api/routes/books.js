@@ -1,9 +1,10 @@
 import express from 'express';
 import joi from 'joi';
+import { Book } from '../models/Book.js';
 
 const router = express.Router();
 
-const BookSchemaValid = joi.object({
+const BookSchema = joi.object({
   title: joi.string().trim().min(3).max(200).required(),
   author: joi.string().trim().min(3).max(200).required(),
   price: joi.number().min(0).required(),
@@ -11,33 +12,20 @@ const BookSchemaValid = joi.object({
   cover: joi.string().trim().required(),
 });
 
-const books = [
-  {
-    id: 1,
-    title: 'book 1',
-    author: 'author 1',
-    description: 'Description 1',
-    price: 10,
-    cover: 'cover 1',
-  },
-  {
-    id: 2,
-    title: 'book 2',
-    author: 'author 2',
-    description: 'Description 2',
-    price: 20,
-    cover: 'cover 2',
-  },
-];
-
 /**
  * @desc Get All routes
  * @route /api/books/
  * @method GET
  * @access public
  */
-router.get('/', (req, res) => {
-  res.json(books);
+router.get('/', async (req, res) => {
+  try {
+    const bookList = await Book.find();
+    res.status(200).json({ message: 'success', books: bookList });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Something wend wrong' });
+  }
 });
 
 /**
@@ -46,13 +34,16 @@ router.get('/', (req, res) => {
  * @method GET
  * @access public
  */
-router.get('/:id', (req, res) => {
-  const book = books.find((b) => b.id === +req.params.id);
-
-  if (book) {
-    res.status(200).json(book);
-  } else {
-    res.status(404).json({ message: 'Book not found' });
+router.get('/:id', async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+    if (book) {
+      res.status(200).json({ message: 'Success', book });
+    } else {
+      res.status(404).json({ message: 'Book not found' });
+    }
+  } catch (err) {
+    res.status(500).json({ message: 'Something wend wrong' });
   }
 });
 
@@ -62,24 +53,27 @@ router.get('/:id', (req, res) => {
  * @method POST
  * @access public
  */
-router.post('/', (req, res) => {
-  const { error } = BookSchemaValid.validate(req.body);
+router.post('/', async (req, res) => {
+  const { error } = BookSchema.validate(req.body);
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
 
-  const newBook = {
-    id: books.length + 1,
-    title: req.body.title,
-    author: req.body.author,
-    description: req.body.description,
-    cover: req.body.cover,
-    price: req.body.price,
-  };
+  try {
+    const newBook = new Book({
+      title: req.body.title,
+      author: req.body.author,
+      description: req.body.description,
+      cover: req.body.cover,
+      price: req.body.price,
+    });
 
-  res.status(201).json(newBook);
-  books.push(newBook);
+    const resApi = await newBook.save();
+    res.status(201).json({ message: 'Sucess', book: resApi });
+  } catch (err) {
+    res.status(500).json({ message: 'Something wend wrong' });
+  }
 });
 
 /**
@@ -88,31 +82,39 @@ router.post('/', (req, res) => {
  * @method PUT
  * @access public
  */
-router.put('/:id', (req, res) => {
-  const book = books.find((b) => b.id === +req.params.id);
-
-  if (!book) {
-    return res.status(404).json({ message: 'Book not found' });
-  }
-
-  const { error } = BookSchemaValid.validate(req.body);
+router.put('/:id', async (req, res) => {
+  const { error } = BookSchema.validate(req.body);
 
   if (error) {
     return res.status(400).json({ message: error.details[0].message });
   }
 
-  const newBook = {
-    title: req.body.title,
-    author: req.body.author,
-    description: req.body.description,
-    cover: req.body.cover,
-    price: req.body.price,
-  };
+  try {
+    const newBook = {
+      title: req.body.title,
+      author: req.body.author,
+      description: req.body.description,
+      cover: req.body.cover,
+      price: req.body.price,
+    };
 
-  const bookIndex = books.indexOf(book);
-  books.splice(bookIndex, 1, { ...newBook, id: book.id });
+    const book = await Book.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: newBook,
+      },
+      { new: true }
+    );
 
-  res.status(200).json({ message: 'Book updated succussfully', data: books });
+    if (!book) {
+      return res.status(404).json({ message: 'book not found' });
+    }
+
+    res.status(200).json({ message: 'Book updated succussfully', data: book });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Something wend wrong' });
+  }
 });
 
 /**
@@ -121,17 +123,20 @@ router.put('/:id', (req, res) => {
  * @method DELETE
  * @access public
  */
-router.delete('/:id', (req, res) => {
-  const book = books.find((b) => b.id === +req.params.id);
+router.delete('/:id', async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id);
+    if (!book) {
+      return res.status(404).json({ message: 'book not found' });
+    }
 
-  if (!book) {
-    return res.status(404).json({ message: 'Book not found' });
+    await Book.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({ message: 'book Deleted succussfully' });
+  } catch (err) {
+    console.log(err);
+    return res.json(500).json({ message: 'Something went wrong' });
   }
-
-  const bookIndex = books.indexOf(book);
-  books.splice(bookIndex, 1);
-
-  res.status(200).json({ message: 'Book Deleted succussfully', data: books });
 });
 
 export default router;
