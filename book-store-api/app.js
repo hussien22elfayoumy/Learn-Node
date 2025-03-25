@@ -3,6 +3,7 @@ import booksRouter from './routes/books.js';
 import authorsRouter from './routes/authors.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import { logger } from './middlewares/logger.js';
 
 dotenv.config();
 
@@ -17,6 +18,9 @@ const app = express();
 
 // Apply middle ware
 app.use(express.json());
+
+app.use(logger);
+
 app.use('/api/books', booksRouter);
 app.use('/api/authors', authorsRouter);
 
