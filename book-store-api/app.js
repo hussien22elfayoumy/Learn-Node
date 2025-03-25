@@ -2,11 +2,13 @@ import express from 'express';
 import booksRouter from './routes/books.js';
 import authorsRouter from './routes/authors.js';
 import mongoose from 'mongoose';
-const PORT = 5000;
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // connect to database
 mongoose
-  .connect('mongodb://127.0.0.1:27017/bookStoreDB')
+  .connect(process.env.MONGO_URI)
   .then(() => console.log('Connectd to mongodbb...'))
   .catch((err) => console.log('Faild to connect', err));
 
@@ -17,5 +19,7 @@ const app = express();
 app.use(express.json());
 app.use('/api/books', booksRouter);
 app.use('/api/authors', authorsRouter);
+
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log(`Server is running on ${PORT}`));
