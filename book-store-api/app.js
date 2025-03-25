@@ -4,6 +4,7 @@ import authorsRouter from './routes/authors.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { logger } from './middlewares/logger.js';
+import { errorHandler, notFound } from './middlewares/errors.js';
 
 dotenv.config();
 
@@ -21,8 +22,15 @@ app.use(express.json());
 
 app.use(logger);
 
+// Routes
 app.use('/api/books', booksRouter);
 app.use('/api/authors', authorsRouter);
+
+// Error handling middleware
+
+app.use(notFound);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 

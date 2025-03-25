@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
     res.status(200).json({ message: 'success', books: bookList });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: 'Something wend wrong' });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -51,7 +51,7 @@ router.get('/:id', async (req, res) => {
       res.status(404).json({ message: 'Book not found' });
     }
   } catch (err) {
-    res.status(500).json({ message: 'Something wend wrong' });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -80,7 +80,7 @@ router.post('/', async (req, res) => {
     const resApi = await newBook.save();
     res.status(201).json({ message: 'Sucess', book: resApi });
   } catch (err) {
-    res.status(500).json({ message: 'Something wend wrong' });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -121,7 +121,7 @@ router.put('/:id', async (req, res) => {
     res.status(200).json({ message: 'Book updated succussfully', data: book });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: 'Something wend wrong' });
+    res.status(500).json({ message: err.message });
   }
 });
 

@@ -43,7 +43,7 @@ router.get('/:id', async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: 'Something wend wrong' });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -73,7 +73,7 @@ router.post('/', async (req, res) => {
     res.status(201).json(resApi);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: 'Something went wrong' });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -114,7 +114,7 @@ router.put('/:id', async (req, res) => {
       .status(200)
       .json({ message: 'author updated succussfully', data: author });
   } catch (err) {
-    res.json(500).json({ message: 'Something went wrong' });
+    res.json(500).json({ message: err.message });
   }
 });
 
@@ -136,7 +136,7 @@ router.delete('/:id', async (req, res) => {
     res.status(200).json({ message: 'Author Deleted succussfully' });
   } catch (err) {
     console.log(err);
-    return res.json(500).json({ message: 'Something went wrong' });
+    return res.json(500).json({ message: err.message });
   }
 });
 
