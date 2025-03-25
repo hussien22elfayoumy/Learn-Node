@@ -1,6 +1,7 @@
 import express from 'express';
 import booksRouter from './routes/books.js';
 import authorsRouter from './routes/authors.js';
+import authRouter from './routes/auth.js';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { logger } from './middlewares/logger.js';
@@ -25,6 +26,7 @@ app.use(logger);
 // Routes
 app.use('/api/books', booksRouter);
 app.use('/api/authors', authorsRouter);
+app.use('/api/auth', authRouter);
 
 // Error handling middleware
 
