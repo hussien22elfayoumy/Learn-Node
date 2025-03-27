@@ -5,6 +5,7 @@ import {
   validateLoginUser,
 } from '../models/User.js';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
@@ -36,7 +37,13 @@ router.post('/signup', async (req, res) => {
     const result = await newUser.save();
     console.log(result);
 
-    const token = null;
+    const token = jwt.sign(
+      { id: user._id, isAdmin: user.isAdmin },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: '4d',
+      }
+    );
 
     const { password, ...rest } = result._doc;
 
@@ -73,7 +80,13 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    const token = null;
+    const token = jwt.sign(
+      { id: user._id, isAdmin: user.isAdmin },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: '4d',
+      }
+    );
 
     const { password, ...rest } = user._doc;
 
