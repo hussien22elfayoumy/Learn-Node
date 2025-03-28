@@ -41,7 +41,6 @@ export function validateRegisterUser(obj) {
     email: Joi.string().email().min(5).max(100).required(),
     username: Joi.string().min(2).max(200).required(),
     password: Joi.string().min(6).required(),
-    isAdmin: Joi.boolean(),
   });
 
   return schema.validate(obj);
@@ -61,7 +60,6 @@ export function validateUpdateUser(obj) {
     email: Joi.string().email().min(5).max(100),
     username: Joi.string().min(2).max(200),
     password: Joi.string().min(6),
-    isAdmin: Joi.boolean(),
   });
 
   return schema.validate(obj);

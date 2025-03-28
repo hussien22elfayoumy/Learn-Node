@@ -31,14 +31,12 @@ router.post('/signup', async (req, res) => {
       email: req.body.email,
       username: req.body.username,
       password: passwordHash,
-      isAdmin: req.body.isAdmin,
     });
 
     const result = await newUser.save();
-    console.log(result);
 
     const token = jwt.sign(
-      { id: user._id, isAdmin: user.isAdmin },
+      { id: result._id, isAdmin: result.isAdmin },
       process.env.JWT_SECRET_KEY,
       {
         expiresIn: '4d',

@@ -1,16 +1,14 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import express from 'express';
 
+import { auhtorizeAdmin, authorizeUser } from '../middlewares/verifyToken.js';
 import { User, validateUpdateUser } from '../models/User.js';
-import { verifyToken } from '../middlewares/verifyToken.js';
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', auhtorizeAdmin, async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select('-password');
 
     res.status(200).json({ users });
   } catch (err) {
@@ -19,10 +17,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.put('/:id', verifyToken, async (req, res) => {
-  if (req.userDecoded.id !== req.params.id)
-    return res.status(403).json({ message: 'Your are not allowed' }); // 403:: forbidden
-
+router.put('/:id', authorizeUser, async (req, res) => {
   const { error } = validateUpdateUser(req.body);
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
@@ -45,8 +40,6 @@ router.put('/:id', verifyToken, async (req, res) => {
         new: true,
       }
     ).select('-password');
-
-    console.log(req.userDecoded);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
