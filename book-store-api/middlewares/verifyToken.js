@@ -24,7 +24,7 @@ export const authorizeUserAndAdmin = async (req, res, next) => {
   });
 };
 
-export const auhtorizeAdmin = async (req, res, next) => {
+export const authorizeAdmin = async (req, res, next) => {
   verifyToken(req, res, () => {
     if (!req.userDecoded.isAdmin)
       return res

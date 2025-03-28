@@ -1,6 +1,7 @@
 import express from 'express';
 import joi from 'joi';
 import { Book } from '../models/Book.js';
+import { authorizeAdmin } from '../middlewares/verifyToken.js';
 
 const router = express.Router();
 
@@ -59,9 +60,9 @@ router.get('/:id', async (req, res) => {
  * @desc Add new book
  * @route /api/books/
  * @method POST
- * @access public
+ * @access private (only admin)
  */
-router.post('/', async (req, res) => {
+router.post('/', authorizeAdmin, async (req, res) => {
   const { error } = BookSchema.validate(req.body);
 
   if (error) {
@@ -88,9 +89,9 @@ router.post('/', async (req, res) => {
  * @desc Update book by id
  * @route /api/books/:id
  * @method PUT
- * @access public
+ * @access private (only admin)
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', authorizeAdmin, async (req, res) => {
   const { error } = BookSchema.validate(req.body);
 
   if (error) {
@@ -129,9 +130,9 @@ router.put('/:id', async (req, res) => {
  * @desc Delete book by id
  * @route /api/books/:id
  * @method DELETE
- * @access public
+ * @access private (only admin)
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authorizeAdmin, async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
     if (!book) {

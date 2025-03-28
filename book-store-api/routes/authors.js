@@ -1,6 +1,7 @@
 import express from 'express';
 import joi from 'joi';
 import { Author } from '../models/Author.js';
+import { authorizeAdmin } from '../middlewares/verifyToken.js';
 
 const router = express.Router();
 
@@ -51,9 +52,9 @@ router.get('/:id', async (req, res) => {
  * @desc Add new author
  * @route /api/authors/
  * @method POST
- * @access public
+ * @access private (only admin)
  */
-router.post('/', async (req, res) => {
+router.post('/', authorizeAdmin, async (req, res) => {
   const { error } = AuthorSchema.validate(req.body);
 
   if (error) {
@@ -81,9 +82,9 @@ router.post('/', async (req, res) => {
  * @desc Update author by id
  * @route /api/authors/:id
  * @method PUT
- * @access public
+ * @access private (only admin)
  */
-router.put('/:id', async (req, res) => {
+router.put('/:id', authorizeAdmin, async (req, res) => {
   const { error } = AuthorSchema.validate(req.body);
 
   if (error) {
@@ -122,9 +123,9 @@ router.put('/:id', async (req, res) => {
  * @desc Delete author
  * @route /api/authors/:id
  * @method DELETE
- * @access public
+ * @access private (only admin)
  */
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authorizeAdmin, async (req, res) => {
   try {
     const author = await Author.findById(req.params.id);
     if (!author) {

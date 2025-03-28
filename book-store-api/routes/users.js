@@ -2,14 +2,14 @@ import bcrypt from 'bcryptjs';
 import express from 'express';
 
 import {
-  auhtorizeAdmin,
+  authorizeAdmin,
   authorizeUserAndAdmin,
 } from '../middlewares/verifyToken.js';
 import { User, validateUpdateUser } from '../models/User.js';
 
 const router = express.Router();
 
-router.get('/', auhtorizeAdmin, async (req, res) => {
+router.get('/', authorizeAdmin, async (req, res) => {
   try {
     const users = await User.find().select('-password');
 
