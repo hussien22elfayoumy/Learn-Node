@@ -3,6 +3,7 @@ import {
   User,
   validateRegisterUser,
   validateLoginUser,
+  generateToken,
 } from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -35,13 +36,15 @@ router.post('/signup', async (req, res) => {
 
     const result = await newUser.save();
 
-    const token = jwt.sign(
-      { id: result._id, isAdmin: result.isAdmin },
-      process.env.JWT_SECRET_KEY,
-      {
-        expiresIn: '4d',
-      }
-    );
+    // const token = jwt.sign(
+    //   { id: result._id, isAdmin: result.isAdmin },
+    //   process.env.JWT_SECRET_KEY,
+    //   {
+    //     expiresIn: '4d',
+    //   }
+    // );
+
+    const token = generateToken({ id: result._id, isAdmin: result.isAdmin });
 
     const { password, ...rest } = result._doc;
 
@@ -78,13 +81,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    const token = jwt.sign(
-      { id: user._id, isAdmin: user.isAdmin },
-      process.env.JWT_SECRET_KEY,
-      {
-        expiresIn: '4d',
-      }
-    );
+    const token = generateToken({ id: user._id, isAdmin: user.isAdmin });
 
     const { password, ...rest } = user._doc;
 

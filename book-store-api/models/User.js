@@ -1,7 +1,8 @@
 import Joi from 'joi';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 
-const userSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
     email: {
       type: String,
@@ -34,7 +35,15 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-export const User = mongoose.model('User', userSchema);
+export const User = mongoose.model('User', UserSchema);
+
+export function generateToken(data) {
+  const token = jwt.sign(data, process.env.JWT_SECRET_KEY, {
+    expiresIn: '4d',
+  });
+
+  return token;
+}
 
 export function validateRegisterUser(obj) {
   const schema = Joi.object({
