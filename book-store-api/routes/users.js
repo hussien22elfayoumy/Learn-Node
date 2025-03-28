@@ -1,7 +1,10 @@
 import bcrypt from 'bcryptjs';
 import express from 'express';
 
-import { auhtorizeAdmin, authorizeUser } from '../middlewares/verifyToken.js';
+import {
+  auhtorizeAdmin,
+  authorizeUserAndAdmin,
+} from '../middlewares/verifyToken.js';
 import { User, validateUpdateUser } from '../models/User.js';
 
 const router = express.Router();
@@ -17,7 +20,19 @@ router.get('/', auhtorizeAdmin, async (req, res) => {
   }
 });
 
-router.put('/:id', authorizeUser, async (req, res) => {
+router.get('/:id', authorizeUserAndAdmin, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'user not found' });
+
+    res.status(200).json({ user });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: `Something went wrong ${err.message}` });
+  }
+});
+
+router.put('/:id', authorizeUserAndAdmin, async (req, res) => {
   const { error } = validateUpdateUser(req.body);
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
@@ -46,6 +61,18 @@ router.put('/:id', authorizeUser, async (req, res) => {
     }
 
     res.status(200).json({ user });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: `Something went wrong ${err.message}` });
+  }
+});
+
+router.delete('/:id', authorizeUserAndAdmin, async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: 'user not found' });
+
+    res.status(200).json({ message: 'User deleted successfully' });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: `Something went wrong ${err.message}` });

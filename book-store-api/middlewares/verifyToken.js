@@ -15,7 +15,7 @@ export const verifyToken = async (req, res, next) => {
   }
 };
 
-export const authorizeUser = async (req, res, next) => {
+export const authorizeUserAndAdmin = async (req, res, next) => {
   verifyToken(req, res, () => {
     if (req.userDecoded.id !== req.params.id && !req.userDecoded.isAdmin)
       return res.status(403).json({ message: 'Your are not allowed' }); // 403:forbidden
