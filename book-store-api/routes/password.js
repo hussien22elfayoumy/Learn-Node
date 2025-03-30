@@ -1,81 +1,19 @@
 import express from 'express';
-import { User } from '../models/User.js';
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
+import {
+  getForgorPasswordView,
+  getResetPasswordView,
+  resetPassword,
+  sendForgotPasswordLink,
+} from '../controllers/passwordController.js';
 
 const router = express.Router();
 
-router.get('/forgot-password', (req, res) => {
-  res.render('forgot-password');
-});
+router.get('/forgot-password', getForgorPasswordView);
 
-router.post('/forgot-password', async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+router.post('/forgot-password', sendForgotPasswordLink);
 
-    console.log(user);
+router.get('/reset-password/:userId/:userToken', getResetPasswordView);
 
-    const secret = process.env.JWT_SECRET_KEY + user.password;
-    const token = jwt.sign({ email: user.email, id: user._id }, secret, {
-      expiresIn: '10m',
-    });
-
-    const link = `http://localhost:5000/password/reset-password/${user._id}/${token}`;
-    res.status(200).json({ message: 'Click on the link', link });
-
-    // TODO: Send email to the user
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-router.get('/reset-password/:userId/:userToken', async (req, res) => {
-  try {
-    const user = await User.findById(req.params.userId);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const secret = process.env.JWT_SECRET_KEY + user.password;
-
-    jwt.verify(req.params.userToken, secret);
-    res.render('reset-password', {
-      email: user.email,
-    });
-  } catch (err) {
-    console.log(err);
-    res.json({ message: 'Error' });
-  }
-});
-
-router.post('/reset-password/:userId/:userToken', async (req, res) => {
-  //TODO: Vlaidateion
-
-  try {
-    const user = await User.findById(req.params.userId);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const secret = process.env.JWT_SECRET_KEY + user.password;
-    jwt.verify(req.params.userToken, secret);
-
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(req.body.password, salt);
-
-    user.password = passwordHash;
-    await user.save();
-
-    res.render('success-password');
-  } catch (err) {
-    console.log(err);
-    res.json({ message: 'Error' });
-  }
-});
+router.post('/reset-password/:userId/:userToken', resetPassword);
 
 export default router;
