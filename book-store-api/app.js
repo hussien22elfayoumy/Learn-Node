@@ -22,6 +22,9 @@ const app = express();
 // Apply middle ware body to json
 app.use(express.json());
 
+// Apply middleware to handle form post requests
+app.use(express.urlencoded({ extended: false }));
+
 // log route url and method in console
 app.use(logger);
 
