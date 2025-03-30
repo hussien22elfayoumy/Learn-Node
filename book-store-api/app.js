@@ -5,6 +5,7 @@ import booksRouter from './routes/books.js';
 import authorsRouter from './routes/authors.js';
 import authRouter from './routes/auth.js';
 import usersRouter from './routes/users.js';
+import passwordRouter from './routes/password.js';
 
 import { logger } from './middlewares/logger.js';
 import { errorHandler, notFound } from './middlewares/errors.js';
@@ -24,11 +25,15 @@ app.use(express.json());
 // log route url and method in console
 app.use(logger);
 
+// set view mode
+app.set('view engine', 'ejs');
+
 // Routes
 app.use('/api/books', booksRouter);
 app.use('/api/authors', authorsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
+app.use('/password', passwordRouter);
 
 // Error handling middleware
 app.use(notFound);
