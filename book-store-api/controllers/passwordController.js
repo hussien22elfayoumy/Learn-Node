@@ -1,6 +1,7 @@
 import { User } from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import nodemailer from 'nodemailer';
 
 export const getForgorPasswordView = (req, res) => {
   res.render('forgot-password');
@@ -21,13 +22,36 @@ export const sendForgotPasswordLink = async (req, res) => {
     });
 
     const link = `http://localhost:5000/password/reset-password/${user._id}/${token}`;
-    res.status(200).json({ message: 'Click on the link', link });
+    // res.status(200).json({ message: 'Click on the link', link });
 
     // TODO: Send email to the user
+    const transporter = nodemailer.createTransport({
+      host: 'gamil',
+      auth: {
+        user: 'my email',
+        password: 'my app  password',
+      },
+    });
+
+    const info = await transporter.sendMail({
+      from: 'my email',
+      to: user.email,
+      html: `
+			<div>
+				<h4>Please Click the link to reset your password</h4>
+				<p>${link}</p>
+			</div>
+			`,
+    });
+
+    console.log('Message sent: %s', info.messageId);
+
+    res.render('email-sent');
   } catch (err) {
     console.log(err);
   }
 };
+
 export const getResetPasswordView = async (req, res) => {
   try {
     const user = await User.findById(req.params.userId);
